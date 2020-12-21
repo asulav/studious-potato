@@ -1,2 +1,15 @@
 # studious-potato
-<font color=red> Family Tree Web-App (Monolith) </font>
+Family Tree Web-App (Monolith)
+## Application Structure:
+  - Backend
+    - Django
+      - DjangoRestFramework
+  - Database
+    - Neo4j
+      - Cypher Query Language
+  - FrontEnd
+    - Vue Js
+    - VueX (StateManagement)
+  - Deployment
+    - Docker
+    - Ansible
