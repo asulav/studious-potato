@@ -13,3 +13,4 @@ Family Tree Web-App (Monolith)
   - Deployment
     - Docker
     - Ansible
+    - Terraform
