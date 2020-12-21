@@ -9,7 +9,7 @@ Family Tree Web-App (Monolith)
       - Cypher Query Language
   - FrontEnd
     - Vue Js
-    - VueX (StateManagement)
+      - VueX (StateManagement)
   - Deployment
     - Docker
     - Ansible
