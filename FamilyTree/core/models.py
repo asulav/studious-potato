@@ -2,39 +2,34 @@
 from neo4j import GraphDatabase
 from django.conf import settings
 
-
 # Create your models here.
-class ConnectDB:
-    def __init__(self, uri, user, password):
-        self.driver = GraphDatabase.driver(uri, auth=(user, password))
-        GraphDatabase.driver("bolt:\\db:7687", auth=("neo4j", "user_pass"))
+class NeoDB:
+    def __init__(self):
+        config = settings.GRAPH_DATABASE
+        self.driver = GraphDatabase.driver(
+            config.url, auth=(config.user, config.password))
 
     def close(self):
         self.driver.close()
 
-    def createUser(user):
-        return f"CREATE (p:Person {{name: \"{user.name}\", age: {user.age}}}) RETURN p"
+    def runQuery(self, query):
+        return self.driver.session().run(query)
 
-    def createRelation(tx, user):
+    def createNode(self, nodeName, age):
+        query = f"CREATE (p:{nodeName} {{name: \"{nodeName}\", age: {age}}}) RETURN p"
+        return self.runQuery(query)
+
+    def deleteNodeQuery(self, nodeName, age):
+        query = f"MATCH (p: {nodeName} {{name: \"{nodeName}\", age: {age}}}) DETACH DELETE p RETURN p"
+        return self.runQuery(query)
+
+    def createRelationQuery(self, node1, node2, relationType):
         # from front end get the first and second user to set their relation ship
-        s = tx.run("MATCH (p1:Person {name: $user.firstUser}" +
-                   "MATCH (p2:Person {name: $user.secondUser})" +
-                   "CREATE (p1)-[rel:$user.relationType]->(p2))")
-        pass
+        query = (f"MATCH (p1:{node1} {{name: \"{node1}\"}})"
+                 f"MATCH (p2:{node2} {{name: \"{node2}\"}})" +
+                 f"CREATE (p1)-[rel:{relationType}]->(p2)) RETURN rel")
+        return self.runQuery(query)
 
-    def reorderRelation(tx, graph):
-        # do we need to reorder the tree so that the root
-        # is the oldest member of the family
-        pass
-
-    def removeRelation(tx, user):
-        s = tx.run(
-            "MATCH (p1:Person {name: $user.firstUser})-[r:$user.relationType]->(p2:Person {name: $user.secondUser})" +
-            "DELETE r")
-        pass
-
-    def printGraph():
-        # how to traverse this tree and show to front end?
-        # to do later
-        # root -> traverse tree -> print
-        pass
+    def removeRelationQuery(self, node1, node2, relationType):
+        query = f"MATCH (p1:{node1} {{name: \"{node1}\",}})-[rel:{relationType}]->(p2:{node2} {{name: \"{node2}\"}})) DELETE rel"
+        return self.runQuery(query)
