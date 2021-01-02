@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # Neo4j
-db/*
+db/
