@@ -85,6 +85,12 @@ DATABASES = {
 }
 
 
+GRAPH_DATABASE: {
+    'url': 'bolt://db:7687',
+    'user_name': 'neo4j',
+    'password': 'user_pass',
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 

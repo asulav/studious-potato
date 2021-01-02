@@ -1,18 +1,19 @@
 #from django.db import models
 from neo4j import GraphDatabase
+from django.conf import settings
 
 
 # Create your models here.
 class ConnectDB:
     def __init__(self, uri, user, password):
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
+        GraphDatabase.driver("bolt:\\db:7687", auth=("neo4j", "user_pass"))
 
     def close(self):
         self.driver.close()
 
-    def createUser(tx, user):
-        s = tx.run(
-            "CREATE (p:Person) {name: $user.name, age: $user.age}")
+    def createUser(user):
+        return f"CREATE (p:Person {{name: \"{user.name}\", age: {user.age}}}) RETURN p"
 
     def createRelation(tx, user):
         # from front end get the first and second user to set their relation ship
