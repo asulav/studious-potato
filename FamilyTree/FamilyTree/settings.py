@@ -13,6 +13,13 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
+from neomodel import config
+
+config.DATABASE_URL = os.environ["NEO4J_BOLT_URL"]
+config.ENCRYPTED_CONNECTION = False
+config.MAX_POOL_SIZE = 50  # default
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,8 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     # Custom Apps
+    'neomodel',
+    'rest_framework'
     'core',
 ]
 
