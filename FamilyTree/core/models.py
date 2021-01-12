@@ -18,5 +18,5 @@ class Person(neomodel.StructuredNode):
     def getAge(self):
         return self.age
 
-    def getRelations(self):
+    def getRelationsArray(self):
         return self.relations
