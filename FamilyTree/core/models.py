@@ -1,35 +1,44 @@
 #from django.db import models
-from neo4j import GraphDatabase
-from django.conf import settings
+from neomodel import StructuredNode, StringProperty, IntegerProperty
+from neomodel import UniqueIdProperty, RelationshipTo
+from neomodel.properties import ArrayProperty
 
-# Create your models here.
-class NeoDB:
+class RelationshipMixin(object):
     def __init__(self):
-        config = settings.GRAPH_DATABASE
-        self.driver = GraphDatabase.driver(
-            config.url, auth=(config.user, config.password))
+        self.all = {}
 
-    def close(self):
-        self.driver.close()
+    def add_relationship(self, model, rel_type):
+        if None in (model, rel_type):
+            raise ValueError(f"RelationShip Types cannot be null")
+        self.all[rel_type] = RelationshipTo(model, rel_type).save()
 
-    def runQuery(self, query):
-        return self.driver.session().run(query)
+    def all(self):
+        return self.all
 
-    def createNode(self, nodeName, age):
-        query = f"CREATE (p:{nodeName} {{name: \"{nodeName}\", age: {age}}}) RETURN p"
-        return self.runQuery(query)
+    def connect(self, rel_type, rel_object):
+        try:
+            temp_rel = self.all[rel_type]
+            temp_rel.manager.connect(rel_object).save()
+        except KeyError:
+            raise KeyError("The given relation could not be found")
 
-    def deleteNodeQuery(self, nodeName, age):
-        query = f"MATCH (p: {nodeName} {{name: \"{nodeName}\", age: {age}}}) DETACH DELETE p RETURN p"
-        return self.runQuery(query)
+class Picture(StructuredNode):
+    uid = UniqueIdProperty()
+    location = StringProperty(required=True)
 
-    def createRelationQuery(self, node1, node2, relationType):
-        # from front end get the first and second user to set their relation ship
-        query = (f"MATCH (p1:{node1} {{name: \"{node1}\"}})"
-                 f"MATCH (p2:{node2} {{name: \"{node2}\"}})" +
-                 f"CREATE (p1)-[rel:{relationType}]->(p2)) RETURN rel")
-        return self.runQuery(query)
+class Person(StructuredNode):
+    uid = UniqueIdProperty()
+    firstName = StringProperty(required=True)
+    lastName = StringProperty(required=True)
+    age = IntegerProperty(default=0)
+    picture = RelationshipTo('Picture', 'pic_location')
+    relationships = RelationshipMixin()
 
-    def removeRelationQuery(self, node1, node2, relationType):
-        query = f"MATCH (p1:{node1} {{name: \"{node1}\",}})-[rel:{relationType}]->(p2:{node2} {{name: \"{node2}\"}})) DELETE rel"
-        return self.runQuery(query)
+    def get_name(self):
+        return f"{self.firstName.capitalize()} {self.lastName.capitalize()}"
+    
+    def get_picture_location(self):
+        return f"{self.picture.location}" if self.picture.location else None
+
+    def add_personal_relationship(self, type):
+        self.relationships.add_relationship("Person", type)
