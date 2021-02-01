@@ -19,19 +19,10 @@ class Person(StructuredNode):
             return f"Relationship already exists"
         
         setattr(self, rel_type, RelationshipTo("Person", rel_type))
-        relationshipAttr = self.__getattribute__(rel_type)
-
-        for name in relationshipAttr.__class__.__dict__.keys():
-            obj = relationshipAttr.__class__.__dict__[name]
-            if isinstance(obj, RelationshipDefinition):
-                setattr(relationshipAttr.__class__, name, obj.build_manager(relationshipAttr, name))
-
-        setattr(relationshipAttr.__class__, rel_type, relationshipAttr.build_manager(relationshipAttr, rel_type))
-        self.save()
+        self.__dict__[rel_type] = self.__getattribute__(rel_type).build_manager(self, rel_type)
 
     def connect(self, rel_type, rel_object):
         try:
-            
             self.__getattribute__(rel_type).connect(rel_object)
             self.save()
         except KeyError:
