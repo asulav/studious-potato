@@ -1,3 +1,4 @@
 djangorestframework==3.12.2
 django==3.1.4
 neomodel==4.0.1
+ipython
