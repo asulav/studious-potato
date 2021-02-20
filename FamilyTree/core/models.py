@@ -4,7 +4,6 @@ from neomodel import UniqueIdProperty, RelationshipTo
 
 import core.relations as relations
 
-
 class Picture(StructuredNode):
     uid = UniqueIdProperty()
     location = StringProperty(required=True)
@@ -15,6 +14,7 @@ class Person(StructuredNode):
     lastName = StringProperty(required=True)
     age = IntegerProperty(default=0)
     picture = RelationshipTo('Picture', 'pic_location')
+    
     # dynamic relationship creation
     for rel_type in relations.get_relations():
         setattr(StructuredNode, rel_type, RelationshipTo("Person", rel_type))
